@@ -1,0 +1,101 @@
+#img_viewer.py
+
+import PySimpleGUI as sg
+import os.path
+'''
+#window tester
+layout = [[sg.Text("Img Test")], [sg.Button("OK")]]
+
+window = sg.Window("Demo", layout)
+#end window tester
+'''
+#First the window layout in 2 columns 
+#first column, holds the chosen directory's image list
+file_list_column = [
+	[
+		sg.Text("Image Folder"),
+		sg.In(size=(25, 1), enable_events = True, key="-FOLDER-"),
+		sg.FolderBrowse(),
+	],
+	[
+		sg.Listbox(
+			values = [], enable_events=True, size=(40, 20), key="-FILE LIST-"
+		)
+	],
+]
+#for now will only show the name of the file that was chosen, will also house the image
+image_viewer_column = [
+	[sg.Text("Choose an image from list on left:")],
+	#displays name of file
+	[sg.Text(size=(40, 1), key="-TOUT-")],
+	#displays image
+	[sg.Image(key="-IMAGE-")],
+]
+#code set defines the layout
+layout = [
+	[
+		sg.Column(file_list_column),
+		#Vertical Seperator: a vertical line, right down the middle of the columns
+		sg.VSeperator(),
+		sg.Column(image_viewer_column),
+	],
+	[
+		sg.Button("Exit")
+	]
+]
+
+window = sg.Window("Image Viewer", layout)
+'''
+#event,values = window.read()
+#if event == "Exit" or event == sg.WIN_CLOSED:
+
+#these do not work. It creates the same previous error. That error being browse will close the whole program. these being the above 2 lines of code.
+'''
+while True:
+	event, values = window.read()
+	if event == "Exit" or event == sg.WIN_CLOSED:
+		break
+		#window.close()
+
+# All items will need to be under the loop, the loops are used for the programs benefit. So it can update itself when an action occurs
+
+#without the items under the loop. Browsing will not find the images in the folder. When you fail to browse for a photo or item and exit out. It will also cause the program to exit
+
+#Folder name was filled in, make a list of files in the folder
+	if event == "-FOLDER-":
+		folder = values["-FOLDER-"]
+		try:
+			# Get list of files in folder
+			#os.listdir(): path(optional): path of the directory
+		#this method returns the list of all files and directories in the specif. path. Returns 			#lists
+			file_list = os.listdir(folder)
+		except:
+			file_list = []
+
+		fnames = [
+	#could this be done with a class instead?
+			f
+			for f in file_list
+			if os.path.isfile(os.path.join(folder, f))
+			and f.lower().endswith((".png", ".gif"))
+		]
+		window["-FILE LIST-"].update(fnames)
+
+	elif event == "-FILE LIST-": # a file was chosen from the listbox
+		try:
+			filename = os.path.join(
+			values["-FOLDER-"], values["-FILE LIST-"][0]
+			)
+			window["-TOUT-"].update(filename)
+			window["-IMAGE-"].update(filename = filename)
+		except:
+			pass
+
+#Would like to try with if statement
+
+'''
+if event == "Exit" or event == sg.WIN_CLOSED:
+	window.close()
+'''
+
+window.close()
